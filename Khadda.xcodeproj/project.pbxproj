@@ -1,0 +1,615 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		CC69D216302DD8D700864BFD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CC69D215302DD8D700864BFD /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		CC69D1DF302DD64000864BFD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CC69D1C7302DD63E00864BFD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CC69D1CE302DD63E00864BFD;
+			remoteInfo = Khadda;
+		};
+		CC69D1E9302DD64000864BFD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CC69D1C7302DD63E00864BFD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CC69D1CE302DD63E00864BFD;
+			remoteInfo = Khadda;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		CC69D1CF302DD63E00864BFD /* Khadda.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Khadda.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC69D1DE302DD64000864BFD /* KhaddaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KhaddaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC69D1E8302DD64000864BFD /* KhaddaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KhaddaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC69D215302DD8D700864BFD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		CC69D21A302DDB0A00864BFD /* Exceptions for "Khadda" folder in "Khadda" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = CC69D1CE302DD63E00864BFD /* Khadda */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		CC69D1D1302DD63E00864BFD /* Khadda */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CC69D21A302DDB0A00864BFD /* Exceptions for "Khadda" folder in "Khadda" target */,
+			);
+			path = Khadda;
+			sourceTree = "<group>";
+		};
+		CC69D1E1302DD64000864BFD /* KhaddaTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = KhaddaTests;
+			sourceTree = "<group>";
+		};
+		CC69D1EB302DD64000864BFD /* KhaddaUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = KhaddaUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CC69D1CC302DD63E00864BFD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC69D1DB302DD64000864BFD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC69D1E5302DD64000864BFD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		CC69D1C6302DD63E00864BFD = {
+			isa = PBXGroup;
+			children = (
+				CC69D215302DD8D700864BFD /* Assets.xcassets */,
+				CC69D1D1302DD63E00864BFD /* Khadda */,
+				CC69D1E1302DD64000864BFD /* KhaddaTests */,
+				CC69D1EB302DD64000864BFD /* KhaddaUITests */,
+				CC69D1D0302DD63E00864BFD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		CC69D1D0302DD63E00864BFD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CC69D1CF302DD63E00864BFD /* Khadda.app */,
+				CC69D1DE302DD64000864BFD /* KhaddaTests.xctest */,
+				CC69D1E8302DD64000864BFD /* KhaddaUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CC69D1CE302DD63E00864BFD /* Khadda */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC69D1F2302DD64000864BFD /* Build configuration list for PBXNativeTarget "Khadda" */;
+			buildPhases = (
+				CC69D1CB302DD63E00864BFD /* Sources */,
+				CC69D1CC302DD63E00864BFD /* Frameworks */,
+				CC69D1CD302DD63E00864BFD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				CC69D1D1302DD63E00864BFD /* Khadda */,
+			);
+			name = Khadda;
+			packageProductDependencies = (
+			);
+			productName = Khadda;
+			productReference = CC69D1CF302DD63E00864BFD /* Khadda.app */;
+			productType = "com.apple.product-type.application";
+		};
+		CC69D1DD302DD64000864BFD /* KhaddaTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC69D1F5302DD64000864BFD /* Build configuration list for PBXNativeTarget "KhaddaTests" */;
+			buildPhases = (
+				CC69D1DA302DD64000864BFD /* Sources */,
+				CC69D1DB302DD64000864BFD /* Frameworks */,
+				CC69D1DC302DD64000864BFD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CC69D1E0302DD64000864BFD /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				CC69D1E1302DD64000864BFD /* KhaddaTests */,
+			);
+			name = KhaddaTests;
+			packageProductDependencies = (
+			);
+			productName = KhaddaTests;
+			productReference = CC69D1DE302DD64000864BFD /* KhaddaTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		CC69D1E7302DD64000864BFD /* KhaddaUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC69D1F8302DD64000864BFD /* Build configuration list for PBXNativeTarget "KhaddaUITests" */;
+			buildPhases = (
+				CC69D1E4302DD64000864BFD /* Sources */,
+				CC69D1E5302DD64000864BFD /* Frameworks */,
+				CC69D1E6302DD64000864BFD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CC69D1EA302DD64000864BFD /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				CC69D1EB302DD64000864BFD /* KhaddaUITests */,
+			);
+			name = KhaddaUITests;
+			packageProductDependencies = (
+			);
+			productName = KhaddaUITests;
+			productReference = CC69D1E8302DD64000864BFD /* KhaddaUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CC69D1C7302DD63E00864BFD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2660;
+				LastUpgradeCheck = 2660;
+				TargetAttributes = {
+					CC69D1CE302DD63E00864BFD = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					CC69D1DD302DD64000864BFD = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = CC69D1CE302DD63E00864BFD;
+					};
+					CC69D1E7302DD64000864BFD = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = CC69D1CE302DD63E00864BFD;
+					};
+				};
+			};
+			buildConfigurationList = CC69D1CA302DD63E00864BFD /* Build configuration list for PBXProject "Khadda" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = CC69D1C6302DD63E00864BFD;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = CC69D1D0302DD63E00864BFD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CC69D1CE302DD63E00864BFD /* Khadda */,
+				CC69D1DD302DD64000864BFD /* KhaddaTests */,
+				CC69D1E7302DD64000864BFD /* KhaddaUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CC69D1CD302DD63E00864BFD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC69D216302DD8D700864BFD /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC69D1DC302DD64000864BFD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC69D1E6302DD64000864BFD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CC69D1CB302DD63E00864BFD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC69D1DA302DD64000864BFD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC69D1E4302DD64000864BFD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CC69D1E0302DD64000864BFD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CC69D1CE302DD63E00864BFD /* Khadda */;
+			targetProxy = CC69D1DF302DD64000864BFD /* PBXContainerItemProxy */;
+		};
+		CC69D1EA302DD64000864BFD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CC69D1CE302DD63E00864BFD /* Khadda */;
+			targetProxy = CC69D1E9302DD64000864BFD /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		CC69D1F0302DD64000864BFD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 33SRNMBZ5D;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		CC69D1F1302DD64000864BFD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 33SRNMBZ5D;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		CC69D1F3302DD64000864BFD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 33SRNMBZ5D;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Khadda/Info.plist;
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "The app needs to know your location in order to determine road conditions";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "The app needs to know your location to monitor road condition";
+				INFOPLIST_KEY_NSLocationUsageDescription = "The app needs to know your location in order to determine road conditions";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "The app needs to know your location in order to determine road conditions";
+				INFOPLIST_KEY_NSMotionUsageDescription = "The app needs to know your location in order to determine road conditions";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = home.Khadda;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CC69D1F4302DD64000864BFD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 33SRNMBZ5D;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Khadda/Info.plist;
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "The app needs to know your location in order to determine road conditions";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "The app needs to know your location to monitor road condition";
+				INFOPLIST_KEY_NSLocationUsageDescription = "The app needs to know your location in order to determine road conditions";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "The app needs to know your location in order to determine road conditions";
+				INFOPLIST_KEY_NSMotionUsageDescription = "The app needs to know your location in order to determine road conditions";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = home.Khadda;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		CC69D1F6302DD64000864BFD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 33SRNMBZ5D;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = home.KhaddaTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Khadda.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Khadda";
+			};
+			name = Debug;
+		};
+		CC69D1F7302DD64000864BFD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 33SRNMBZ5D;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = home.KhaddaTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Khadda.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Khadda";
+			};
+			name = Release;
+		};
+		CC69D1F9302DD64000864BFD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 33SRNMBZ5D;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = home.KhaddaUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Khadda;
+			};
+			name = Debug;
+		};
+		CC69D1FA302DD64000864BFD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 33SRNMBZ5D;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = home.KhaddaUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Khadda;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CC69D1CA302DD63E00864BFD /* Build configuration list for PBXProject "Khadda" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC69D1F0302DD64000864BFD /* Debug */,
+				CC69D1F1302DD64000864BFD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CC69D1F2302DD64000864BFD /* Build configuration list for PBXNativeTarget "Khadda" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC69D1F3302DD64000864BFD /* Debug */,
+				CC69D1F4302DD64000864BFD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CC69D1F5302DD64000864BFD /* Build configuration list for PBXNativeTarget "KhaddaTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC69D1F6302DD64000864BFD /* Debug */,
+				CC69D1F7302DD64000864BFD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CC69D1F8302DD64000864BFD /* Build configuration list for PBXNativeTarget "KhaddaUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC69D1F9302DD64000864BFD /* Debug */,
+				CC69D1FA302DD64000864BFD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CC69D1C7302DD63E00864BFD /* Project object */;
+}
