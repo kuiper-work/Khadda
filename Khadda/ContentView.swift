@@ -133,7 +133,7 @@ class LocationAndMotionManager: NSObject, CLLocationManagerDelegate {
         motionAuthorizationStatus = CMMotionActivityManager.authorizationStatus()
 
         // Start monitoring activity updates
-        //startActivityUpdates()
+        startActivityUpdates()
             
         // Load saved tracks on initialization
         loadSavedTracks()
