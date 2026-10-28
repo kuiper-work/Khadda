@@ -8,27 +8,31 @@
 import SwiftUI
 import MapKit
 
+// MARK: - SavedTracksView
 struct SavedTracksView: View {
     let track: Track
 
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 4) {
             Text(track.date, style: .date)
                 .font(.headline)
             Text(track.date, style: .time)
                 .font(.subheadline)
                 .foregroundColor(.secondary)
+            
             HStack {
                 Text("Distance: \(track.distance / 1000, specifier: "%.2f") km")
                 Spacer()
                 Text("Avg Bumpiness: \(track.avgBumpiness, specifier: "%.4f")")
                     .foregroundColor(track.avgBumpiness.bumpinessColor())
             }
+            .font(.subheadline)
         }
-        .padding(.vertical, 5)
+        .padding(.vertical, 4)
     }
 }
-// MARK: - TrackHistoryView (New View)
+
+// MARK: - TrackHistoryView
 struct TrackHistoryView: View {
     @State var manager: LocationAndMotionManager
     @State private var selectedTracks = Set<UUID>()
@@ -38,8 +42,11 @@ struct TrackHistoryView: View {
     var body: some View {
         List(selection: $selectedTracks) {
             if manager.savedTracks.isEmpty {
-                Text("No tracks saved yet. Start a ride!")
-                    .foregroundColor(.gray)
+                ContentUnavailableView(
+                    "No Rides Recorded",
+                    systemImage: "map",
+                    description: Text("Start a ride to automatically track and record road bumpiness.")
+                )
             } else {
                 ForEach(manager.savedTracks) { track in
                     NavigationLink(destination: TrackDetailView(track: track)) {
@@ -65,7 +72,6 @@ struct TrackHistoryView: View {
                 }
             }
         }
-        
     }
     
     func deleteSelected() {
@@ -98,7 +104,7 @@ struct TrackHistoryView: View {
     }
 }
 
-// MARK: - TrackDetailView (New View)
+// MARK: - TrackDetailView
 struct TrackDetailView: View {
     let track: Track
     @State private var region: MKCoordinateRegion
@@ -111,27 +117,32 @@ struct TrackDetailView: View {
     }
 
     var body: some View {
-        VStack {
-            MapView(region: $region, selectedSegmentID: $selectedSegmentID, segments: track.segments, showsUserLocation: false) // Show historical segments, no live user dot
+        VStack(spacing: 0) {
+            MapView(regionToDisplay: $region, selectedSegmentID: $selectedSegmentID, segments: track.segments, showsUserLocation: false)
             
-            VStack(alignment: .leading) {
-                Text("Ride Details")
-                    .font(.title2)
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Track Analysis")
+                    .font(.title3)
                     .fontWeight(.bold)
-                    .padding(.bottom, 5)
 
-                Text("Date: \(track.date, style: .date)")
-                Text("Time: \(track.date, style: .time)")
-                Text("Distance: \(track.distance / 1000, specifier: "%.2f") km")
                 HStack {
-                    Text("Average Bumpiness:")
-                    Text("\(track.avgBumpiness, specifier: "%.4f")")
-                        .foregroundColor(track.avgBumpiness.bumpinessColor())
+                    Label(track.date.formatted(date: .abbreviated, time: .shortened), systemImage: "calendar")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Label(String(format: "%.2f km", track.distance / 1000), systemImage: "location.fill")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
                 }
+
+                Divider()
+
+                // Track Bumpiness Gauge (displayed exclusively when selecting a track from History)
+                BumpinessGaugeView(bumpinessScore: track.avgBumpiness)
             }
             .padding()
-            .background(.ultraThinMaterial)
-            .cornerRadius(10)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .shadow(color: .black.opacity(0.12), radius: 10, x: 0, y: 4)
             .padding()
         }
         // Corrected navigationTitle usage: Pass a Text view with the formatted date
@@ -166,10 +177,9 @@ struct TrackDetailView: View {
             longitude: (minLon + maxLon) / 2
         )
         let span = MKCoordinateSpan(
-            latitudeDelta: (maxLat - minLat) * 1.2, // Add some padding
-            longitudeDelta: (maxLon - minLon) * 1.2
+            latitudeDelta: max((maxLat - minLat) * 1.2, 0.005),
+            longitudeDelta: max((maxLon - minLon) * 1.2, 0.005)
         )
         return MKCoordinateRegion(center: center, span: span)
     }
 }
-

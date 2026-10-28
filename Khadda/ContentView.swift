@@ -3,7 +3,57 @@ import MapKit
 import CoreLocation
 import CoreMotion
 
+// MARK: - StatusDotView
+/// A reusable status indicator dot component.
+/// Displays a green dot with a pulsating aura when active (`isActive == true`)
+/// or a solid grey dot when standby/inactive (`isActive == false`).
+struct StatusDotView: View {
+    /// Controls whether the indicator represents an active state (green/pulsating) or inactive state (grey).
+    var isActive: Bool
+    
+    /// State variable animating the expanding aura ring scale and opacity.
+    @State private var isPulsating = false
+
+    var body: some View {
+        ZStack {
+            // Expanding aura ring (rendered only when active)
+            if isActive {
+                Circle()
+                    .fill(Color.green.opacity(0.35))
+                    .frame(width: 18, height: 18)
+                    .scaleEffect(isPulsating ? 1.6 : 0.8)
+                    .opacity(isPulsating ? 0.0 : 0.9)
+            }
+            
+            // Core solid dot indicator
+            Circle()
+                .fill(isActive ? Color.green : Color.gray)
+                .frame(width: 8, height: 8)
+        }
+        .onAppear {
+            if isActive {
+                startPulsatingAnimation()
+            }
+        }
+        .onChange(of: isActive) { _, newValue in
+            if newValue {
+                startPulsatingAnimation()
+            } else {
+                isPulsating = false
+            }
+        }
+    }
+    
+    /// Starts the continuous smooth pulse animation loop for the outer aura ring.
+    private func startPulsatingAnimation() {
+        withAnimation(.easeOut(duration: 1.2).repeatForever(autoreverses: false)) {
+            isPulsating = true
+        }
+    }
+}
+
 // MARK: - CodableCoordinate (Helper for CLLocationCoordinate2D)
+/// A Codable wrapper for `CLLocationCoordinate2D` to allow encoding & persistence to JSON.
 struct CodableCoordinate: Codable {
     let latitude: CLLocationDegrees
     let longitude: CLLocationDegrees
@@ -13,23 +63,23 @@ struct CodableCoordinate: Codable {
         self.longitude = coordinate.longitude
     }
 
-    // Getter method to dynamically retrieve the coordinates
+    /// Converts back to standard CoreLocation `CLLocationCoordinate2D`.
     var clCoordinate: CLLocationCoordinate2D {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
-    
 }
 
 // MARK: - RoadSegment Model
-// Represents a segment of the road with its coordinates and calculated bumpiness.
-struct RoadSegment: Identifiable, Codable { // Now Codable
+/// Represents a single recorded road segment between two GPS coordinate updates with an associated bumpiness variance score.
+struct RoadSegment: Identifiable, Codable {
     var id = UUID()
-    let startCoordinate: CodableCoordinate // Use CodableCoordinate
-    let endCoordinate: CodableCoordinate   // Use CodableCoordinate
-    let bumpinessScore: Double // Higher score means bumpier
+    let startCoordinate: CodableCoordinate
+    let endCoordinate: CodableCoordinate
+    let bumpinessScore: Double
 }
 
-// MARK: - Track Model (New for persistence)
+// MARK: - Track Model
+/// Represents a complete recorded trip session containing aggregated metrics and individual road segments.
 struct Track: Identifiable, Codable {
     let id: UUID
     let date: Date
@@ -46,71 +96,75 @@ struct Track: Identifiable, Codable {
     }
 }
 
+// MARK: - Map Overlay Render Helpers
+/// Renders circle overlays on the map.
+func drawCircleOverPolyline(_ overlay: MKCircle) -> MKOverlayRenderer {
+    let renderer = MKCircleRenderer(circle: overlay)
+    renderer.strokeColor = .systemBlue
+    renderer.fillColor = .systemTeal
+    renderer.lineWidth = 2
+    return renderer
+}
+
+/// Renders road segment polylines with colors corresponding to bumpiness categories.
+func drawPolyline(_ overlay: MKPolyline) -> MKOverlayRenderer {
+    let renderer = MKPolylineRenderer(polyline: overlay)
+    let colorString = overlay.title ?? "green"
+    switch colorString {
+    case "green": renderer.strokeColor = .green
+    case "orange": renderer.strokeColor = .orange
+    case "red": renderer.strokeColor = .red
+    case "darkRed": renderer.strokeColor = .init(red: 0.5, green: 0, blue: 0, alpha: 1.0)
+    case "black": renderer.strokeColor = .black
+    default: renderer.strokeColor = .gray
+    }
+    return renderer
+}
+
 // MARK: - BumpinessColor Extension
-// Helper to map bumpiness score to a specific color.
 extension Double {
+    /// Extension helper returning the SwiftUI Color associated with this bumpiness score.
     func bumpinessColor() -> Color {
-        // Define thresholds for bumpiness scores to map to colors
-        // These values will likely need calibration based on real-world testing
-        if self < 0.005 { // Very smooth (adjusted threshold)
-            return .green
-        } else if self < 0.015 { // Smooth (adjusted threshold)
-            return .orange
-        } else if self < 0.03 { // Bumpy (adjusted threshold)
-            return .red
-        } else if self < 0.05 { // Very Bumpy (adjusted threshold)
-            return .init(red: 0.5, green: 0, blue: 0) // Dark Red
-        } else { // Extremely Bumpy / Pothole
-            return .black
-        }
+        BumpinessCategory.category(for: self).color
     }
 }
 
 // MARK: - LocationAndMotionManager
-// Manages CoreLocation and CoreMotion data acquisition.
+/// Main location & motion telemetry manager.
+/// Integrates CoreLocation (GPS position/speed) with CoreMotion accelerometer variance computation and activity classification.
 @MainActor
 @Observable
 class LocationAndMotionManager: NSObject, CLLocationManagerDelegate {
-    // MARK: Published Properties
     var region = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194), // Default to San Francisco
+        center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
     private(set) var currentSpeed: CLLocationSpeed = 0.0
     private(set) var currentBumpiness: Double = 0.0
-    private(set) var roadSegments: [RoadSegment] = [] // To save them for later use
-    private(set) var isTracking: Bool = false // Indicates if location/accelerometer updates are active
+    private(set) var roadSegments: [RoadSegment] = []
+    private(set) var isTracking: Bool = false
+    private(set) var isManualTracking: Bool = false
     private(set) var authorizationStatus: CLAuthorizationStatus = .notDetermined
     private(set) var motionAuthorizationStatus: CMAuthorizationStatus = .notDetermined
     
-    // New properties for activity detection
     private(set) var currentActivityType: String = "Unknown"
     var autoTrackingEnabled: Bool = true // User preference for automatic start/stop
 
-    // New properties for summary
     private(set) var totalDistance: CLLocationDistance = 0.0
     private(set) var averageBumpiness: Double = 0.0
 
-    // New: Stored tracks
     var savedTracks: [Track] = []
     var selectedSegmentID: UUID? = nil
 
-    // MARK: Private Properties
     private let locationManager = CLLocationManager()
     private let motionManager = CMMotionManager()
     private let activityManager = CMMotionActivityManager()
     
     private var lastLocation: CLLocation?
     private var locationAccuracy: CLLocationAccuracy = kCLLocationAccuracyKilometer
-    private var accelerometerDataBuffer: [Double] = []
-    private let bufferSize = 50 // Increased buffer size for xbumpiness calculation (was 20)
-    // Accelerometer provides 100 data points per second, 1 per each cycle. i.e. 1 data every 0.01 second (100 milliseconds)
-    private let accelerometerUpdateInterval: TimeInterval = 1.0 / 100.0 // 50 Hz
-    
-    let deviceManagerActivityQueue = OperationQueue()
+    private var bumpinessEngine = BumpinessEngine(windowSize: 50)
+    private let accelerometerUpdateInterval: TimeInterval = 1.0 / 50.0
 
-    
-    // MARK: Initialization
     override init() {
         super.init()
         locationManager.delegate = self
@@ -139,59 +193,59 @@ class LocationAndMotionManager: NSObject, CLLocationManagerDelegate {
         loadSavedTracks()
     }
 
-    // MARK: Public Methods
     func setInitialRegionToUserLocation() {
         locationManager.requestLocation()
     }
     
-    func startTracking() {
-        // Ensure necessary permissions are granted before starting
+    /// Starts recording a ride session.
+    /// - Parameter isManual: Set to `true` when manually initiated via the UI menu to prevent auto-stop triggers on non-automotive activity.
+    func startTracking(isManual: Bool = false) {
         guard (authorizationStatus == .authorizedAlways || authorizationStatus == .authorizedWhenInUse) else {
             print("Location services not authorized.")
             return
         }
         
-        // Check for motion activity authorization (essential for automatic tracking)
         guard motionAuthorizationStatus == .authorized else {
             print("Motion activity not authorized.")
             return
         }
 
-        guard !isTracking else { return } // Prevent starting if already tracking
+        guard !isTracking else { return }
 
         isTracking = true
+        isManualTracking = isManual
         roadSegments.removeAll()
         lastLocation = nil
-        accelerometerDataBuffer.removeAll()
+        bumpinessEngine.reset()
         currentBumpiness = 0.0
-        totalDistance = 0.0 // Reset total distance
-        averageBumpiness = 0.0 // Reset average bumpiness
+        totalDistance = 0.0
+        averageBumpiness = 0.0
         locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
         locationManager.startUpdatingLocation()
 
         if motionManager.isAccelerometerAvailable {
             motionManager.accelerometerUpdateInterval = accelerometerUpdateInterval
             motionManager.startAccelerometerUpdates(to: .main) { [weak self] (data, error) in
-                guard let self = self, let acceleration = data?.acceleration else { return }
-                self.processAccelerometerData(acceleration)
+                guard let self = self, let accelerationData = data else { return }
+                self.processAccelerometerData(accelerationData)
             }
         } else {
-            print("Device motion is not available.")
+            print("Accelerometer is not available.")
         }
-        print("Tracking started.")
+        print("Tracking started. Manual mode: \(isManual)")
         
-        // Prevent screen from going to sleep
         UIApplication.shared.isIdleTimerDisabled = true
     }
 
+    /// Stops tracking, computes average bumpiness score across segments, saves track to disk, and restores idle timer.
     func stopTracking() {
-        guard isTracking else { return } // Prevent stopping if not tracking
+        guard isTracking else { return }
 
         isTracking = false
+        isManualTracking = false
         locationManager.stopUpdatingLocation()
-        motionManager.stopDeviceMotionUpdates()
+        motionManager.stopAccelerometerUpdates()
         
-        // Calculate average bumpiness upon stopping
         if !roadSegments.isEmpty {
             let totalBumpiness = roadSegments.reduce(0) { $0 + $1.bumpinessScore }
             averageBumpiness = totalBumpiness / Double(roadSegments.count)
@@ -200,67 +254,33 @@ class LocationAndMotionManager: NSObject, CLLocationManagerDelegate {
         }
 
         print("Tracking stopped. Total segments: \(roadSegments.count)")
-        
-        // Save the completed track
         saveCurrentTrack()
-        
-        // Allow screen to go to sleep again
         UIApplication.shared.isIdleTimerDisabled = false
     }
     
     func requestPermissions() {
-        // Check current authorization status
         let currentStatus = locationManager.authorizationStatus
 
         switch currentStatus {
-        case .notDetermined:
-            // If not determined, request "Always" authorization directly.
-            // This will typically show "Allow While Using App" and "Don't Allow" initially.
-            // If the user chooses "Allow While Using App", they might get a second prompt later for "Always".
-            // Or, they'll need to go to settings manually.
-            locationManager.requestAlwaysAuthorization()
-        case .authorizedWhenInUse:
-            // If already authorized "When In Use", try to upgrade to "Always".
-            // This might prompt the user again.
+        case .notDetermined, .authorizedWhenInUse:
             locationManager.requestAlwaysAuthorization()
         case .denied, .restricted:
-            // Permissions denied or restricted. App cannot get location.
-            print("Location services denied or restricted. User needs to enable in settings.")
-            // The alert in ContentView already handles directing to settings.
+            print("Location services denied or restricted.")
         default:
-            break // Already authorizedAlways or unknown status
+            break
         }
-        
-        // Motion activity permission is typically implicitly granted with CoreMotion usage
-        // but it's good to check its status.
-        // CMMotionActivityManager.requestAuthorization() is not a public API.
-        // The authorizationStatus is read-only.
-        // If the user denies, you'll see .denied.
     }
 
-    // MARK: Private Methods - Accelerometer Processing
-    private func processAccelerometerData(_ acceleration: CMAcceleration) {
-        // Using userAcceleration (gravity-removed) to get orientation-independent motion
-        // Calculate magnitude of acceleration vector for detecting bumps regardless of phone orientation
-        let magnitude = sqrt(acceleration.x * acceleration.x +
-                           acceleration.y * acceleration.y +
-                           acceleration.z * acceleration.z)
-        accelerometerDataBuffer.append(magnitude)
-
-        if accelerometerDataBuffer.count > bufferSize {
-            accelerometerDataBuffer.removeFirst() // Keep buffer size constant
-        }
-
-        if accelerometerDataBuffer.count == bufferSize {
-            // Calculate bumpiness as the variance of acceleration magnitude in the buffer
-            let sum = accelerometerDataBuffer.reduce(0, +)
-            let mean = sum / Double(bufferSize)
-            let variance = accelerometerDataBuffer.map { pow($0 - mean, 2) }.reduce(0, +) / Double(bufferSize)
-            currentBumpiness = variance // Variance as bumpiness score
-        }
+    /// Ingests 3-axis accelerometer data into the BumpinessEngine and updates currentBumpiness.
+    private func processAccelerometerData(_ accelerationData: CMAccelerometerData) {
+        currentBumpiness = bumpinessEngine.addSample(
+            x: accelerationData.acceleration.x,
+            y: accelerationData.acceleration.y,
+            z: accelerationData.acceleration.z
+        )
     }
     
-    // MARK: Private Methods - Activity Detection
+    /// Starts CMMotionActivityManager updates to automatically start/stop tracking when automotive driving is detected.
     private func startActivityUpdates() {
         guard CMMotionActivityManager.isActivityAvailable() else {
             print("Motion Activity is not available on this device.")
@@ -271,9 +291,8 @@ class LocationAndMotionManager: NSObject, CLLocationManagerDelegate {
         activityManager.startActivityUpdates(to: .main) { [weak self] (activity) in
             guard let self = self, let activity = activity else { return }
             
-            self.motionAuthorizationStatus = CMMotionActivityManager.authorizationStatus() // Update status
+            self.motionAuthorizationStatus = CMMotionActivityManager.authorizationStatus()
             
-            // Update current activity type for UI display
             if activity.automotive {
                 self.currentActivityType = "Driving"
             } else if activity.walking {
@@ -288,15 +307,13 @@ class LocationAndMotionManager: NSObject, CLLocationManagerDelegate {
                 self.currentActivityType = "Unknown"
             }
             
-            // Auto-tracking logic
-            if self.autoTrackingEnabled {
+            // Auto-tracking logic: trigger start when driving, stop when stationary or walking (unless manually overridden)
+            if self.autoTrackingEnabled && !self.isManualTracking {
                 if activity.automotive && activity.confidence != .low {
-                    // Start tracking if driving and not already tracking
                     if !self.isTracking {
-                        self.startTracking()
+                        self.startTracking(isManual: false)
                     }
                 } else if (activity.walking || activity.running || activity.cycling || activity.stationary) && activity.confidence != .low {
-                    // Stop tracking if activity is not automotive and currently tracking
                     if self.isTracking {
                         self.stopTracking()
                     }
@@ -305,23 +322,19 @@ class LocationAndMotionManager: NSObject, CLLocationManagerDelegate {
         }
     }
 
-    // MARK: CLLocationManagerDelegate
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let newLocation = locations.last else { return }
 
-        // Update map region to current location
         region = MKCoordinateRegion(center: newLocation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005))
-        currentSpeed = newLocation.speed > 0 ? newLocation.speed : 0.0 // Ensure speed is non-negative
+        currentSpeed = newLocation.speed > 0 ? newLocation.speed : 0.0
 
-        // Always add a segment if lastLocation exists to ensure continuous path drawing
         if let lastLoc = lastLocation {
-            // Add distance to totalDistance
             totalDistance += newLocation.distance(from: lastLoc)
 
             let segment = RoadSegment(
-                startCoordinate: CodableCoordinate(coordinate: lastLoc.coordinate), // Use CodableCoordinate
-                endCoordinate: CodableCoordinate(coordinate: newLocation.coordinate), // Use CodableCoordinate
-                bumpinessScore: currentBumpiness // Use the current bumpiness for this segment
+                startCoordinate: CodableCoordinate(coordinate: lastLoc.coordinate),
+                endCoordinate: CodableCoordinate(coordinate: newLocation.coordinate),
+                bumpinessScore: currentBumpiness
             )
             roadSegments.append(segment)
         }
@@ -334,22 +347,19 @@ class LocationAndMotionManager: NSObject, CLLocationManagerDelegate {
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         authorizationStatus = manager.authorizationStatus
-        // If authorization changes, and we are tracking, re-evaluate
         if authorizationStatus != .authorizedAlways && authorizationStatus != .authorizedWhenInUse && isTracking {
-            stopTracking() // Stop if permissions are revoked while tracking
+            stopTracking()
         } else {
             setInitialRegionToUserLocation()
         }
     }
 
-    // MARK: - Persistence Methods
-    // Changed to internal access level
+    // MARK: Persistence Helpers
     func tracksDirectoryURL() throws -> URL {
         try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
             .appendingPathComponent("Tracks")
     }
 
-    // Changed to internal access level
     func trackFileURL(for id: UUID) throws -> URL {
         try tracksDirectoryURL().appendingPathComponent("\(id.uuidString).json")
     }
@@ -376,8 +386,8 @@ class LocationAndMotionManager: NSObject, CLLocationManagerDelegate {
             try data.write(to: fileURL)
             
             DispatchQueue.main.async {
-                self.savedTracks.append(newTrack) // Add to our in-memory list
-                self.savedTracks.sort { $0.date > $1.date } // Sort by most recent first
+                self.savedTracks.append(newTrack)
+                self.savedTracks.sort { $0.date > $1.date }
                 print("Track saved successfully to: \(fileURL.lastPathComponent)")
             }
         } catch {
@@ -406,12 +416,10 @@ class LocationAndMotionManager: NSObject, CLLocationManagerDelegate {
                     loadedTracks.append(track)
                 } catch {
                     print("Failed to load track from \(fileURL.lastPathComponent): \(error.localizedDescription)")
-                    // Optionally delete corrupted files
-                    // try? FileManager.default.removeItem(at: fileURL)
                 }
             }
             DispatchQueue.main.async {
-                self.savedTracks = loadedTracks.sorted { $0.date > $1.date } // Sort by most recent first
+                self.savedTracks = loadedTracks.sorted { $0.date > $1.date }
                 print("Loaded \(self.savedTracks.count) tracks.")
             }
         } catch {
@@ -421,7 +429,7 @@ class LocationAndMotionManager: NSObject, CLLocationManagerDelegate {
 }
 
 // MARK: - MapViewCoordinator
-// MKMapViewDelegate for drawing polylines.
+/// Coordinator acting as delegate for `MKMapView`. Manages polyline rendering, tap gesture interaction, and pin annotation callouts.
 class MapViewCoordinator: NSObject, MKMapViewDelegate {
     var parent: MapView
 
@@ -430,7 +438,6 @@ class MapViewCoordinator: NSObject, MKMapViewDelegate {
     }
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        // Use a marker-style callout for the bumpiness popup
         let identifier = "BumpinessAnnotation"
         var view = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) as? MKMarkerAnnotationView
         if view == nil {
@@ -445,28 +452,22 @@ class MapViewCoordinator: NSObject, MKMapViewDelegate {
     }
     
     func presentCallout(for annotation: MKAnnotation, on mapView: MKMapView) {
-        // Ensure the annotation is visible and selected
         mapView.selectAnnotation(annotation, animated: true)
     }
 
     @objc func handleMapTap(_ gesture: UITapGestureRecognizer) {
         guard let mapView = gesture.view as? MKMapView else { return }
         let point = gesture.location(in: mapView)
-        // Iterate overlays to find the first polyline whose renderer path contains the tap point
         for overlay in mapView.overlays {
             guard let polyline = overlay as? MKPolyline else { continue }
             let renderer = mapView.renderer(for: polyline) as? MKPolylineRenderer
-            // Convert tap point to the renderer's coordinate space
             let mapPoint = MKMapPoint(mapView.convert(point, toCoordinateFrom: mapView))
             let rendererPoint = renderer?.point(for: mapPoint) ?? .zero
             if let path = renderer?.path {
-                // Increase tappable width by stroking a wider path
                 let tapPath = path.copy(strokingWithWidth: max(renderer?.lineWidth ?? 5, 20), lineCap: .round, lineJoin: .round, miterLimit: 0)
                 if tapPath.contains(rendererPoint) {
-                    // Found tapped polyline; update selected ID via parent binding
                     if let idString = polyline.subtitle, let id = UUID(uuidString: idString) {
                         parent.selectedSegmentID = id
-                        // Trigger re-render by resetting overlays (force refresh)
                         mapView.removeOverlays(mapView.overlays)
                         mapView.addOverlays([overlay] + mapView.overlays)
                     }
@@ -474,50 +475,35 @@ class MapViewCoordinator: NSObject, MKMapViewDelegate {
                 }
             }
         }
-        // If no overlay hit, clear selection
         parent.selectedSegmentID = nil
     }
 
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-        if let polyline = overlay as? MKPolyline {
-            let renderer = MKPolylineRenderer(polyline: polyline)
-            // Determine base color from title
-            let colorString = polyline.title ?? "green"
-            switch colorString {
-            case "green": renderer.strokeColor = .green
-            case "orange": renderer.strokeColor = .orange
-            case "red": renderer.strokeColor = .red
-            case "darkRed": renderer.strokeColor = .init(red: 0.5, green: 0, blue: 0, alpha: 1.0)
-            case "black": renderer.strokeColor = .black
-            default: renderer.strokeColor = .gray
-            }
-            // Highlight if selected
-            if let idString = polyline.subtitle, let id = UUID(uuidString: idString), id == parent.selectedSegmentID {
-                renderer.lineWidth = 8
-                renderer.strokeColor = .systemBlue
-            } else {
-                renderer.lineWidth = 5
-            }
-            renderer.lineCap = .round
-            return renderer
+        switch overlay {
+        case let overlay as MKCircle:
+            return drawCircleOverPolyline(overlay)
+        case let overlay as MKPolyline:
+            return drawPolyline(overlay)
+        default:
+            return MKOverlayRenderer(overlay: overlay)
         }
-        return MKOverlayRenderer(overlay: overlay)
     }
 }
 
 // MARK: - MapView (UIKit Wrapper for SwiftUI)
-// Wraps MKMapView for use in SwiftUI.
+/// Reusable SwiftUI wrapper for `MKMapView` supporting coordinate region bindings, polylines, and selected segment annotations.
 struct MapView: UIViewRepresentable {
-    @Binding var region: MKCoordinateRegion
+    @Binding var regionToDisplay: MKCoordinateRegion
     @Binding var selectedSegmentID: UUID?
-    var segments: [RoadSegment] // Now takes an array of RoadSegment
-    var showsUserLocation: Bool = true // Added to control user location dot for history view
+    var segments: [RoadSegment]
+    var showsUserLocation: Bool = true
 
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
         mapView.delegate = context.coordinator
-        mapView.showsUserLocation = showsUserLocation // Control based on parameter
+        mapView.showsUserLocation = showsUserLocation
         
+        mapView.addOverlay(MKCircle())
         let tap = UITapGestureRecognizer(target: context.coordinator, action: #selector(MapViewCoordinator.handleMapTap(_:)))
         mapView.addGestureRecognizer(tap)
         
@@ -525,37 +511,34 @@ struct MapView: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: MKMapView, context: Context) {
-        uiView.setRegion(region, animated: true)
-
-        // Remove old overlays and add new ones
+        uiView.setRegion(regionToDisplay, animated: true)
         uiView.removeOverlays(uiView.overlays)
+        
+        let movingCircleOverPolyline = MKCircle(center: regionToDisplay.center, radius: 40)
+        uiView.addOverlay(movingCircleOverPolyline)
+        
         for segment in segments {
-            let coordinates = [segment.startCoordinate.clCoordinate, segment.endCoordinate.clCoordinate] // Use clCoordinate
+            let coordinates = [segment.startCoordinate.clCoordinate, segment.endCoordinate.clCoordinate]
             let polyline = MKPolyline(coordinates: coordinates, count: 2)
-            // Pass color as title for simplicity in MVP
             polyline.title = segment.bumpinessScore.bumpinessColor().description
-            // Store the segment ID in subtitle for hit-testing and selection mapping
             polyline.subtitle = segment.id.uuidString
             uiView.addOverlay(polyline)
         }
         
-        // Manage bumpiness popup annotation for selected segment
-        // Remove existing bumpiness annotations we added previously
         let existing = uiView.annotations.filter { ($0.subtitle ?? nil) == "bumpiness" }
         uiView.removeAnnotations(existing)
 
         if let selectedID = selectedSegmentID, let selected = segments.first(where: { $0.id == selectedID }) {
-            // Compute midpoint of the segment
             let start = selected.startCoordinate.clCoordinate
             let end = selected.endCoordinate.clCoordinate
             let mid = CLLocationCoordinate2D(latitude: (start.latitude + end.latitude) / 2.0,
                                              longitude: (start.longitude + end.longitude) / 2.0)
             let annotation = MKPointAnnotation()
             annotation.coordinate = mid
-            annotation.title = String(format: "Bumpiness: %.5f", selected.bumpinessScore)
-            annotation.subtitle = "bumpiness" // mark for later removal
+            let category = BumpinessCategory.category(for: selected.bumpinessScore)
+            annotation.title = "\(category.rawValue) (\(String(format: "%.4f", selected.bumpinessScore)))"
+            annotation.subtitle = "bumpiness"
             uiView.addAnnotation(annotation)
-            // Present the callout
             context.coordinator.presentCallout(for: annotation, on: uiView)
         }
     }
@@ -566,64 +549,107 @@ struct MapView: UIViewRepresentable {
 }
 
 // MARK: - ContentView (Main SwiftUI View)
+/// Main application view presenting the full-screen map, live telemetry activity card, and top status bar.
 struct ContentView: View {
     @State private var manager = LocationAndMotionManager()
     @State private var showingPermissionAlert = false
 
+    /// Computes whether active driving and recording is currently taking place.
+    var isDrivingAndTracking: Bool {
+        manager.isTracking && manager.currentActivityType == "Driving"
+    }
+
     var body: some View {
-        NavigationStack { // Wrap in NavigationView
-            VStack {
-                MapView(region: $manager.region, selectedSegmentID: $manager.selectedSegmentID, segments: manager.roadSegments) // Live segments
+        NavigationStack {
+            ZStack(alignment: .top) {
+                // Map Background View
+                MapView(regionToDisplay: $manager.region, selectedSegmentID: $manager.selectedSegmentID, segments: manager.roadSegments)
                     .ignoresSafeArea()
-                    .overlay(alignment: .top) {
-                        ActivityView(manager: manager)
-                    }
-                    .overlay(alignment: .bottom) {
-                        // Display summary only when not tracking
-                        SummaryView(manager: manager)
-                    }
+                
+                // Map Overlay UI Controls
                 VStack {
-                    Toggle(isOn: $manager.autoTrackingEnabled) {
-                        Text("Auto-Track Driving")
+                    if manager.isTracking {
+                        ActivityView(
+                            currentSpeed: manager.currentSpeed,
+                            currentBumpiness: manager.currentBumpiness,
+                            currentActivityType: manager.currentActivityType
+                        )
+                        .padding(.top, 8)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                    } else if !manager.roadSegments.isEmpty {
+                        SummaryView(
+                            totalDistance: manager.totalDistance,
+                            avgBumpiness: manager.averageBumpiness
+                        )
+                        .padding(.top, 8)
+                        .transition(.move(edge: .top).combined(with: .opacity))
                     }
-                    .padding(.horizontal)
                     
-                    Button(action: {
-                        if manager.isTracking {
-                            // If tracking, always allow stopping
-                            manager.stopTracking()
-                        } else {
-                            // If not tracking, proceed with permission checks and start
-                            if manager.authorizationStatus == .notDetermined || manager.motionAuthorizationStatus == .notDetermined {
-                                showingPermissionAlert = true
-                            } else if manager.authorizationStatus == .denied || manager.motionAuthorizationStatus == .denied {
-                                showingPermissionAlert = true // User denied previously
-                            } else {
-                                manager.startTracking()
+                    Spacer()
+                    
+                    // Bottom Controls Bar (shown during active tracking)
+                    if manager.isTracking {
+                        Button(action: {
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                manager.stopTracking()
                             }
-                        }
-                    }) {
-                        Text(manager.isTracking ? "Stop Tracking" : "Start Tracking")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(manager.isTracking ? Color.red : Color.blue)
+                        }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "stop.fill")
+                                Text("Stop Recording")
+                                    .fontWeight(.bold)
+                            }
+                            .font(.headline)
                             .foregroundColor(.white)
-                            .cornerRadius(15)
+                            .padding(.vertical, 14)
+                            .padding(.horizontal, 28)
+                            .background(Color.red, in: Capsule())
+                            .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
+                        }
+                        .padding(.bottom, 30)
                     }
-                    // The START button is disabled ONLY if the app is ALREADY tracking AND auto-tracking is enabled.
-                    // The STOP button (when manager.isTracking is true) is always enabled.
-                    .disabled(!manager.isTracking && manager.autoTrackingEnabled)
                 }
-                .padding()
             }
-            .navigationTitle("Pothole Detector")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                // Principal Top Header with Status Dot & Car Driving Icon
+                ToolbarItem(placement: .principal) {
+                    HStack(spacing: 8) {
+                        StatusDotView(isActive: isDrivingAndTracking)
+                        
+                        Image(systemName: "car.side.fill")
+                            .font(.title3)
+                            .foregroundColor(isDrivingAndTracking ? .primary : .gray)
+                    }
+                }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink(destination: TrackHistoryView(manager: manager)) {
-                        Text("History")
+                        Image(systemName: "clock.arrow.circlepath")
+                            .font(.headline)
+                    }
+                }
+                
+                // Manual Start Option Menu for non-car rides or testing
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Menu {
+                        Button(action: {
+                            withAnimation {
+                                if manager.isTracking {
+                                    manager.stopTracking()
+                                } else {
+                                    manager.startTracking(isManual: true)
+                                }
+                            }
+                        }) {
+                            Label(
+                                manager.isTracking ? "Stop Tracking" : "Start Manual Trip",
+                                systemImage: manager.isTracking ? "stop.circle" : "record.circle"
+                            )
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                            .font(.headline)
                     }
                 }
             }
@@ -633,13 +659,12 @@ struct ContentView: View {
         }
         .alert("Permissions Required", isPresented: $showingPermissionAlert) {
             Button("OK") {
-                // Direct user to settings if permissions are denied
                 if manager.authorizationStatus == .denied || manager.motionAuthorizationStatus == .denied {
                     if let url = URL(string: UIApplication.openSettingsURLString) {
                         UIApplication.shared.open(url)
                     }
                 } else {
-                    manager.requestPermissions() // Try requesting again if not determined
+                    manager.requestPermissions()
                 }
             }
             Button("Cancel", role: .cancel) { }
@@ -649,9 +674,6 @@ struct ContentView: View {
     }
 }
 
-
-
 #Preview {
     ContentView()
 }
-
