@@ -2,31 +2,47 @@
 //  ActivityView.swift
 //  RoadSmoothness
 //
-//  Created by Jay Desai on 06/12/25.
-//
 
 import SwiftUI
 
 struct ActivityView: View {
-    @Bindable var manager: LocationAndMotionManager
+    var currentSpeed: Double
+    var currentBumpiness: Double
+    var currentActivityType: String
     
+    var isDriving: Bool {
+        currentActivityType == "Driving"
+    }
+
     var body: some View {
-        VStack {
-            Text("Road Smoothness Tracker")
-                .font(.headline)
-                .padding(.bottom, 5)
+        VStack(spacing: 8) {
+            HStack(spacing: 8) {
+                StatusDotView(isActive: isDriving)
+                
+                Image(systemName: "car.side.fill")
+                    .font(.headline)
+                    .foregroundColor(isDriving ? .primary : .gray)
+            }
+            .padding(.bottom, 2)
             
-//            Text("Activity: \(manager.currentActivityType)")
-//                .font(.subheadline)
-            Text("Speed: \(manager.currentSpeed, specifier: "%.1f") m/s")
+            Text("Activity: \(currentActivityType)")
                 .font(.subheadline)
-            Text("Bumpiness: \(manager.currentBumpiness, specifier: "%.4f")")
+                .foregroundColor(.secondary)
+            
+            Text("Speed: \(currentSpeed * 3.6, specifier: "%.1f") km/h")
                 .font(.subheadline)
-                .foregroundColor(manager.currentBumpiness.bumpinessColor())
+            
+            Text("Bumpiness: \(currentBumpiness, specifier: "%.4f")")
+                .font(.subheadline)
+                .foregroundColor(currentBumpiness.bumpinessColor())
         }
         .padding()
-        .background(.ultraThinMaterial)
-        .cornerRadius(10)
-        .padding(.top, 50) // Adjust for notch/status bar
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 3)
+        .padding(.horizontal)
     }
+}
+
+#Preview {
+    ActivityView(currentSpeed: 12.5, currentBumpiness: 0.024, currentActivityType: "Driving")
 }

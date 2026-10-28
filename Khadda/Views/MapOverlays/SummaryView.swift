@@ -4,26 +4,33 @@
 //
 //  Created by Jay Desai on 06/12/25.
 //
+
 import SwiftUI
 
 struct SummaryView: View {
-    @Bindable var manager: LocationAndMotionManager
+    var totalDistance: Double
+    var avgBumpiness: Double
     
     var body: some View {
-        if !manager.isTracking {
-            VStack {
-                Text("Ride Summary")
-                    .font(.headline)
-                    .padding(.bottom, 5)
-                Text("Total Distance: \(manager.totalDistance / 1000, specifier: "%.2f") km")
-                    .font(.subheadline)
-                Text("Average Bumpiness: \(manager.averageBumpiness, specifier: "%.4f")")
-                    .font(.subheadline)
-            }
-            .padding()
-            .background(.ultraThinMaterial)
-            .cornerRadius(10)
-            .padding(.bottom, 100) // Adjust to be above the button
+        VStack(spacing: 8) {
+            Text("Ride Summary")
+                .font(.headline)
+                .padding(.bottom, 2)
+            
+            Text("Total Distance: \(totalDistance / 1000, specifier: "%.2f") km")
+                .font(.subheadline)
+            
+            Text("Average Bumpiness: \(avgBumpiness, specifier: "%.4f")")
+                .font(.subheadline)
+                .foregroundColor(avgBumpiness.bumpinessColor())
         }
+        .padding()
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 3)
+        .padding(.horizontal)
     }
+}
+
+#Preview {
+    SummaryView(totalDistance: 5400, avgBumpiness: 0.018)
 }
